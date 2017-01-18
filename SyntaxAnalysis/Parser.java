@@ -44,7 +44,8 @@ public class Parser {
         NUM, ADD, SUB, MUL, DIV, LP, RP, e
     }
 
-    private static ArrayList<GType>[][] table = new ArrayList[GType.F.ordinal()+1][Token.Type.values().length+1];
+    private static ArrayList<GType>[][] table = new ArrayList[GType.F.ordinal() + 1][Token.Type.values().length + 1];
+
     static {
         ArrayList<GType> temp = table[GType.E.ordinal()][Token.Type.num.ordinal()] = new ArrayList<>();
         temp.add(GType.T);
@@ -99,13 +100,21 @@ public class Parser {
     }
 
 
-    public void nonterminal(ParserTree.TreeNode node, GType who) {
+    public void derive(GType who) {
         Token token = tokenizer.nextToken();
-        if(token == null)
-            return;
+        if (token == null) {        // EOF
+            for (int i = 0; i < table[who.ordinal()].length; i++) {
+                ArrayList<GType> production = table[who.ordinal()][i];
+                if (production != null && production.get(0) == GType.e)
+                    return;
+            }
+
+            error(who);
+        }
+
         ArrayList<GType> production = table[who.ordinal()][token.getTokenName().ordinal()];
         tokenizer.store(token);
-        if(production == null) {
+        if (production == null) {
             error(who);
         }
 
@@ -114,30 +123,18 @@ public class Parser {
             System.out.print(production.get(i) + " ");
         }
         System.out.println();
-        int k = 0;
-        for(GType g : production) {
+        for (GType g : production) {
             // if g is a terminal
-            if(g.compareTo(GType.F) <= 0) {
-                ParserTree.TreeNode newNode = new ParserTree.TreeNode();
-                newNode.isTerminal = false;
-                newNode.gType = g;
-                node.childs[k++] = newNode;
-                nonterminal(newNode, g);
+            if (g.compareTo(GType.F) <= 0) {
+                derive(g);
             } else {
-                if(g == GType.e) {
+                if (g == GType.e) {
                     continue;
                 }
                 token = tokenizer.nextToken();
                 tokenList.add(token);
-                if(g.ordinal()-5 != token.getTokenName().ordinal()) {
+                if (g.ordinal() - 5 != token.getTokenName().ordinal()) {
                     error(who);
-                }
-                else {
-                    ParserTree.TreeNode newNode = new ParserTree.TreeNode();
-                    newNode.isTerminal = true;
-                    newNode.token = token;
-                    node.childs[k++] = newNode;
-                    continue;
                 }
             }
         }
@@ -146,7 +143,7 @@ public class Parser {
 
     // TODO
     private void error(GType who) {
-        System.out.println(who);
+        System.err.println("syntax error:" + who);
         System.exit(-1);
     }
 
@@ -155,17 +152,11 @@ public class Parser {
     }
 
     public static void main(String[] args) {
-        Parser parser = new Parser("(5*3)");
-        ParserTree pt = parser.parse();
-        pt.travesal();
+        Parser parser = new Parser("5+6+9-(55*3)/2");
+        parser.parse();
     }
 
-    private ParserTree parse() {
-        ParserTree pt = new ParserTree();
-        pt.root = new ParserTree.TreeNode();
-        pt.root.gType = GType.E;
-        pt.root.isTerminal = false;
-        nonterminal(pt.root, GType.E);
-        return pt;
+    private void parse() {
+        derive(GType.E);
     }
 }

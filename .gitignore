@@ -1,0 +1,7 @@
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+simple-expression-compiler.iml
+/.idea/uiDesigner.xml
