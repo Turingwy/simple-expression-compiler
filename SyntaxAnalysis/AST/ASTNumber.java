@@ -4,13 +4,13 @@ package SyntaxAnalysis.AST;
  * Created by turingwy on 1/18/17.
  */
 public class ASTNumber extends ASTNode {
-    private int number;
+    private String number;
 
-    public int getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public ASTNumber(int number) {
+    public ASTNumber(String number) {
         type = AbstractSyntaxTree.NodeType.AST_NUM;
         this.number = number;
     }

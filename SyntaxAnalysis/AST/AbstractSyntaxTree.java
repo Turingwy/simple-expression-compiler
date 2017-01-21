@@ -14,7 +14,7 @@ public class AbstractSyntaxTree {
 
     private List<String> stackLanguage;
     private ASTNode root;                             // root of the ast.
-    private int result;
+    private double result;
 
     public AbstractSyntaxTree(ASTNode root) {
         this.root = root;
@@ -49,7 +49,7 @@ public class AbstractSyntaxTree {
                 stmt = "DIV";
                 break;
             case AST_NUM:
-                stmt = Integer.toString(((ASTNumber) root).getNumber());
+                stmt = "PUSH " + ((ASTNumber) root).getNumber();
                 break;
         }
 
@@ -62,7 +62,7 @@ public class AbstractSyntaxTree {
         stackLanguage.add(stmt);
     }
 
-    public int compute() {
+    public double compute() {
         if (result != 0)
             return result;
 
@@ -70,11 +70,13 @@ public class AbstractSyntaxTree {
         return result;
     }
 
-    private int compute(ASTNode root) {
+    private double compute(ASTNode root) {
         if (root == null)
             return 0;
-        if (root.type == NodeType.AST_NUM)
-            return ((ASTNumber) root).getNumber();
+        if (root.type == NodeType.AST_NUM) {
+            String number = ((ASTNumber) root).getNumber();
+            return Double.parseDouble(number);
+        }
 
         ASTOperator operator = (ASTOperator) root;
         switch (root.type) {

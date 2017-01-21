@@ -23,10 +23,10 @@ public class ASTOperator extends ASTNode {
         this.right = right;
     }
 
-    public ASTOperator(AbstractSyntaxTree.NodeType type) {
+    public ASTOperator(AbstractSyntaxTree.NodeType type, ASTNode left, ASTNode right) {
         this.type = type;
+        this.right = right;
+        this.left = left;
     }
 
-    public ASTOperator() {
-    }
 }
